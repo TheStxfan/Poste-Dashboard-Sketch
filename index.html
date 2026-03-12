@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Service Dashboard - Poste Centrali</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="params.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <div class="logo">POSTE</div>
+            <nav>
+                <button onclick="showSection('home')" class="nav-btn active" id="btn-home">Home</button>
+                <button onclick="showSection('scenari')" class="nav-btn" id="btn-scenari">Scenari</button>
+                <button onclick="showSection('edit')" class="nav-btn" id="btn-edit">Edit</button>
+            </nav>
+        </div>
+        <div class="status-indicator">
+            <span class="dot green"></span>
+            SISTEMA OPERATIVO
+        </div>
+    </header>
+
+    <main id="section-home">
+        <!-- Contenuto Dashboard (KPI, Grafici, Tabella) -->
+        <section class="kpi-grid">
+            <div class="card">
+                <h3>Utenti / Giorno</h3>
+                <p id="kpi-users" class="value">-</p>
+                <p class="subtitle">Target: <span id="target-users">1200</span></p>
+            </div>
+            <div class="card">
+                <h3>Sportelli Attivi</h3>
+                <p id="kpi-counters" class="value">-</p>
+                <p class="subtitle">Totale: <span id="target-counters">12</span></p>
+            </div>
+            <div class="card">
+                <h3>Tempo Medio Servizio</h3>
+                <p id="kpi-avg-time" class="value">-</p>
+                <p class="subtitle">Soglia: <span id="target-avg-time">6 min</span></p>
+            </div>
+            <div class="card">
+                <h3>Capacità Oraria</h3>
+                <p id="kpi-capacity" class="value">-</p>
+                <p class="subtitle">Utenti/ora</p>
+            </div>
+        </section>
+
+        <section class="charts-section">
+            <div class="chart-container">
+                <h3>Monitoraggio Code vs Capacità (λ vs μ)</h3>
+                <canvas id="queueChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Utenti Concorrenti (App/Web/Totem)</h3>
+                <canvas id="trafficChart"></canvas>
+            </div>
+        </section>
+
+        <section class="bottom-section">
+            <div class="infrastructure-table">
+                <h3>Costi Mensili Infrastruttura IT</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Risorsa IT</th>
+                            <th>Quantità</th>
+                            <th>Costo Unitario</th>
+                            <th>Costo Totale</th>
+                        </tr>
+                    </thead>
+                    <tbody id="infra-body"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3">TOTALE MENSILE</td>
+                            <td id="total-cost">-</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="alerts-panel">
+                <h3>Alert Critiche</h3>
+                <div id="alerts-list"></div>
+            </div>
+        </section>
+    </main>
+
+    <main id="section-scenari" style="display: none;">
+        <section class="scenari-container">
+            <h2>Seleziona uno Scenario Predefinito</h2>
+            <p>Scegli un profilo per testare istantaneamente gli algoritmi della dashboard con dati unici.</p>
+            <div class="scenari-grid" id="scenari-list">
+                <!-- Popolato da JS -->
+            </div>
+        </section>
+    </main>
+
+    <main id="section-edit" style="display: none;">
+        <section class="edit-container">
+            <h2>Modifica Parametri Manuali</h2>
+            <!-- Pannello Edit esistente -->
+            <div class="edit-grid">
+                <div class="edit-card">
+                    <h3>KPI Principali</h3>
+                    <div class="input-group">
+                        <label>Utenti / Giorno</label>
+                        <input type="number" id="input-users" oninput="updateData()">
+                    </div>
+                    <div class="input-group">
+                        <label>Sportelli Attivi</label>
+                        <input type="number" id="input-counters" oninput="updateData()">
+                    </div>
+                    <div class="input-group">
+                        <label>Tempo Medio (min)</label>
+                        <input type="number" id="input-avg-time" oninput="updateData()">
+                    </div>
+                </div>
+
+                <div class="edit-card">
+                    <h3>Costi Infrastruttura (€)</h3>
+                    <div class="input-group">
+                        <label>Server Web / Frontend</label>
+                        <input type="number" id="cost-web" oninput="updateData()">
+                    </div>
+                    <div class="input-group">
+                        <label>Server Database</label>
+                        <input type="number" id="cost-db" oninput="updateData()">
+                    </div>
+                    <div class="input-group">
+                        <label>Load Balancer</label>
+                        <input type="number" id="cost-lb" oninput="updateData()">
+                    </div>
+                    <div class="input-group">
+                        <label>Storage Dati</label>
+                        <input type="number" id="cost-storage" oninput="updateData()">
+                    </div>
+                    <div class="input-group">
+                        <label>API Gateway</label>
+                        <input type="number" id="cost-api" oninput="updateData()">
+                    </div>
+                </div>
+
+                <div class="edit-card">
+                    <h3>Fattore di Moltiplicazione Traffico</h3>
+                    <div class="input-group">
+                        <label>Moltiplicatore (%)</label>
+                        <input type="range" id="input-multiplier" min="50" max="300" value="100" oninput="updateData()">
+                        <span id="multiplier-val">100</span>%
+                    </div>
+                </div>
+            </div>
+            <button class="reset-btn" onclick="resetToDefault()">Ripristina Default</button>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
